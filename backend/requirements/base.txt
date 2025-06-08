@@ -1,0 +1,25 @@
+# Core
+fastapi == 0.115.12
+uvicorn[standard] 
+python-multipart 
+
+# Database
+sqlmodel
+psycopg2-binary
+alembic
+redis
+
+# Security
+python-jose[cryptography]
+passlib[bcrypt]
+python-dotenv
+
+# Validation
+email-validator
+pydantic[email]
+pydantic-settings
+
+# AI & Utils
+openai
+httpx
+python-dateutil
