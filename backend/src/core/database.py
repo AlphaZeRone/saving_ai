@@ -1,10 +1,10 @@
-from sqlmodel import SQLModel, Session, create_engine
+from sqlmodel import SQLModel, Session, create_engine, text
 from typing import Generator
 import os
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://postgres:password@localhost:5432/saving_db"
+    "postgresql://postgres:password@localhost:5432/saving_ai_dev"
 )
 
 engine = create_engine(DATABASE_URL, echo = True)
@@ -22,7 +22,7 @@ if  __name__ == "__main__":
     print(f"Testing database connection to: {DATABASE_URL}")
     try:
         with Session(engine) as session:
-            result = session.exec("SELECT 1 as test")
+            result = session.exec(text("SELECT 1 as test"))
             print(f"✅ Database connection successful: {result.first()}")
     except Exception as e:
         print(f"❌ Database connection failed: {e}")
