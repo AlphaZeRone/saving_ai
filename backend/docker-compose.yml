@@ -1,5 +1,5 @@
 services:
-  posetgres:
+  postgres:
     image: timescale/timescaledb:latest-pg16
     container_name: saving_ai_db
     environment:

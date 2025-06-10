@@ -38,7 +38,8 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title = "AI Saving Assistant - MVP", 
     version = "0.1.0",
-    description = "MVP Version for academic submiossion"
+    description = "MVP Version for academic submiossion",
+    lifespan = lifespan
 )
 
 # ===== CORS Configuration ============
@@ -73,9 +74,12 @@ async def test_database(session: Session = Depends(get_session)):
     try:
         from sqlmodel import text
         result = session.exec(text("SELECT 1 as test")).first()
+
+        test_value = result[0] if result else None
+
         return {
             "database": "connected",
-            "result": result,
+            "result": test_value,
             "message": "Database Connection Successful"
         }
     except Exception as e:
