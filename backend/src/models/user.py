@@ -6,8 +6,8 @@ Feature
 - Account status management
 """
 
-from typing import Optional, Dict, Any
-from sqlmodel import SQLModel, Field, Column, String, JSON
+from typing import Optional
+from sqlmodel import SQLModel, Field
 from datetime import date
 import enum
 
@@ -24,22 +24,12 @@ class UserRole(str, enum.Enum):
     FREE = "free"
     PREMIUM = "premium"
     ADMIN = "admin" 
-    EDUCATOR = "educator" # เผื่อรันในมหาลัยได้
-
-class AIPersonalityLevel(int, enum.Enum):
-    "ระดับความสนิทกับ AI"
-
-    POLITE = 1
-    FRIENDLY = 2
-    INTIMATE = 3
 
 class UserStatus(str, enum.Enum):
     "สถานะบัญชีผู้ใช้"
 
     ACTIVE = "active" # ใช่งานปกติ
     INACTIVE = "inactive" # ยังไม่ยืนยัน email
-    SUSPENDED = "suspended" # ถูกระงับ
-    BANNED = "banned" # ถูกแบน
 
 # ====== UserModel =======
 
@@ -72,7 +62,7 @@ class User(BaseModel, table = True):
         description = "ชื่อผู้ใช้ (unique)"
     )
 
-    pasword_hash: str = Field(
+    password_hash: str = Field(
         max_length = 255,
         description = "รหัสผ่านที่เข้ารหัสแล้ว"
     )
@@ -97,18 +87,6 @@ class User(BaseModel, table = True):
         description = "ชื่อที่แสดง (ไม่มีใช้ username)"
     )
 
-    date_of_birth: Optional[date] = Field(
-        default = None,
-        max_length = 100,
-        description = "วันเกิด"
-    )
-
-    occupation: Optional[str] = Field(
-        default = None,
-        max_length = 100,
-        description = "อาชีพ"
-    )
-
     # ===== Account Status =======
     role: UserRole = Field(
         default = UserRole.FREE,
@@ -130,42 +108,6 @@ class User(BaseModel, table = True):
         description = "เข้าสู่ระบบครั้งล่าสุด"
     )
 
-    #=== AI Preference ======
-    ai_personality_level: AIPersonalityLevel = Field(
-        default = AIPersonalityLevel.POLITE,
-        description = "ระดับความสนิทกับ AI"
-    )
-
-    ai_daily_limit: int = Field(
-        default = 0,
-        description = "จำนวนครั้งที่ใช้ AI ได้ต่อวัน "
-    )
-
-    ai_used_today: int = Field(
-        default = 0,
-        description = "จำนวนครั้งที่ใช้ AI ไปวันนี้"
-    )
-
-    # ===== User Settings (JSON) =======
-
-    settings: Dict[str, Any] = Field(
-        default_factory = dict,
-        sa_column = Column(JSON),
-        description = "การตั้งค่าของผู้ใช้"
-    )
-
-    # ======= financial preference =======
-    preferred_currency: str = Field(
-        default = "THB",
-        max_length = 3,
-        description = "สกุลเงินที่ใช้"
-    )
-
-    monthly_income: Optional[float] = Field(
-        default = None,
-        description = "รายได้ต่อเดือน"
-    )
-
     # ==== Compute Properties ======
     @property
     def full_name(self) -> str:
@@ -181,22 +123,6 @@ class User(BaseModel, table = True):
     def is_active(self) -> bool:
         return self.status == UserStatus.ACTIVE and self.is_active
     
-    @property
-    def can_use_ai(self) -> bool:
-        if self.is_premium:
-            return True
-        return self.ai_used_today < self.ai_daily_limit
-    
-    @property
-    def age(self) -> Optional[int]:
-        if not self.date_of_birth:
-            return None
-        from datetime import date
-        today = date.today()
-        return today.year - self.date_of_birth.year - (
-            (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day)
-        )
-    
 # ====== User Schema สำหรับ API
 
 class UserRead(SQLModel):
@@ -206,68 +132,30 @@ class UserRead(SQLModel):
     first_name: Optional[str]
     last_name: Optional[str]
     display_name: Optional[str]
-    date_of_birth: Optional[date]
     role: UserRole
     status: UserStatus
     is_verified: bool
-    ai_personality_level: AIPersonalityLevel
-    preferred_currency: str
     created_at: str
 
-    @property
-    def full_name(self) -> str:
-        if self.first_name and self.last_name:
-            return f"{self.first_name} {self.last_name}"
-    
 class UserCreate(SQLModel):
     email: str = Field(min_length = 5, max_length = 255)
     username: str = Field(min_length = 3, max_length = 50)
     password: str = Field(min_length = 8, max_length = 100)
     first_name: Optional[str] = Field(default = None, max_length = 100)
     last_name: Optional[str] = Field(default = None, max_length = 100)
-    date_of_birth: Optional[date] = None
-    occupation: Optional[str] = Field(default = None, max_length = 100)
 
 class UserUpdate(SQLModel):
     first_name: Optional[str] = Field(default=None, max_length=100)
     last_name: Optional[str] = Field(default=None, max_length=100)
     display_name: Optional[str] = Field(default=None, max_length=100)
-    date_of_birth: Optional[date] = None
-    occupation: Optional[str] = Field(default=None, max_length=100)
-    ai_personality_level: Optional[AIPersonalityLevel] = None
-    preferred_currency: Optional[str] = Field(default=None, max_length=3)
-    monthly_income: Optional[float] = None
-
-class UserSetting(SQLModel):
-    notifications_enabled: bool = True
-    email_notifications: bool = True
-    dark_mode: bool = False
-    language: str = "th"
-    timezone: str = "Asia/Bangkok"
-    auto_categorize: bool = True
-    ai_tips_frequency: str = "daily" 
 
 # ==== Helper Function ==========
-def create_default_settings() -> Dict[str, Any]:
-    "สร้าง Default setting ให้ User ใหม่"
-    
-    return {
-        "notifications_enabled": True,
-        "email_notifications": True,
-        "dark_mode": False,
-        "language": "th",
-        "timezone": "Asia/Bangkok",
-        "auto_catagorize": True,
-        "ai_tips_frequency": "daily"
-    }
 
-def upgrade_to_premium(user: User) -> User:
-    user.role = UserRole.PREMIUM
-    user.ai_daily_limit = 500
+def active_user(user: User) -> User:
+    "เปิดใช้งาน User"
+    user.status = UserStatus.ACTIVE
+    user.is_verified = True
     user.updated_at = utc_now()
-
-def reset_daily_ai_usage(user: User) -> User:
-    user.ai_used_today = 0
     return user
 
 # ========= Example =================
@@ -283,19 +171,18 @@ if __name__ == "__main__":
         password_hash="hashed_password_here",
         first_name="Test",
         last_name="User",
-        settings=create_default_settings()
     )
     
     print(f"User ID: {new_user.id}")
     print(f"Full name: {new_user.full_name}")
     print(f"Is premium: {new_user.is_premium}")
-    print(f"Can use AI: {new_user.can_use_ai}")
-    print(f"Settings: {new_user.settings}")
+    print(f"Is active: {new_user.is_active}")
+    print(f"Status: {new_user.status}")
     
-    # ทดสอบ upgrade to premium
-    print("\n=== Testing Premium Upgrade ===")
-    upgrade_to_premium(new_user)
-    print(f"Role after upgrade: {new_user.role}")
-    print(f"AI daily limit: {new_user.ai_daily_limit}")
+    # ทดสอบ activate user
+    print("\n=== Testing User Activation ===")
+    active_user(new_user)
+    print(f"Status after activation: {new_user.status}")
+    print(f"Is verified: {new_user.is_verified}")
     
     print("\n✅ User Model ทำงานปกติ!")

@@ -4,6 +4,7 @@ from sqlmodel import Session, create_engine, SQLModel
 from contextlib import asynccontextmanager
 import os
 from dotenv import load_dotenv
+from api.auth import router as auth_router
 
 load_dotenv()
 
@@ -67,6 +68,10 @@ async def health_check():
         "status": "healthy",
         "timestamp": "2025-06-10"
     }
+
+# ======== Include Router ========
+
+app.include_router(auth_router, prefix = "/api/auth", tags = ["Authetication"])
 
 # ====== Testing Database Connection =========
 @app.get("/test-db")
