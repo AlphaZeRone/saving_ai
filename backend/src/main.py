@@ -44,7 +44,7 @@ app = FastAPI(
 # ===== CORS Configuration ============
 app.add_middleware(
     CORSMiddleware,
-    allow_origin = ["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins = ["http://localhost:3000", "http://127.0.0.1:3000"],
     allow_credentials = True,
     allow_methods = ["*"],
     allow_headers = ["*"]
@@ -57,7 +57,7 @@ async def root():
         "message": "AI Saving Assistant MVP",
         "version": "0.1.0",
         "status": "running",
-        "docs": "/dos"
+        "docs": "/docs"
     }
 
 @app.get("/health")
