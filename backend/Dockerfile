@@ -1,0 +1,11 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirement.txt .
+RUN pip install --no-cache-dir -r requirement.txt
+
+COPY src/ ./src
+ENV PYTHONPATH=/app/src
+
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
