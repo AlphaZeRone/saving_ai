@@ -29,7 +29,6 @@ async def create_transaction(
         description = transaction_data.description,
         note = transaction_data.note,
         transaction_date = transaction_data.transaction_date,
-        is_ai_categorize = transaction_data.is_ai_categorize
     )
 
     # Save to DB
@@ -40,15 +39,16 @@ async def create_transaction(
     # แปลง object เป็น TransactionRead Response
     transaction_response = TransactionRead(
         id = str(new_transaction.id),
-        user_id = new_transaction.user_id,
+        user_id = str(new_transaction.user_id),
         amount = new_transaction.amount,
         type = new_transaction.type,
         category = new_transaction.category,
         note = new_transaction.note,
-        transaction_date = new_transaction.transaction_date.isoformat(),
+        description = new_transaction.description,
+        transaction_date = new_transaction.transaction_date,
         is_ai_categorize = new_transaction.is_ai_categorize,
         created_at = new_transaction.created_at.isoformat(),
-        updated_at = new_transaction.updated_at
+        updated_at = new_transaction.updated_at.isoformat() if new_transaction.updated_at else None
     )
 
     return transaction_response
@@ -63,7 +63,24 @@ async def  get_current_user_transaction(
         select(Transaction).where(Transaction.user_id == current_user.id)
     ).all()
 
-    return transactions
+    transaction_responses = []
+    for transaction in transactions:
+        transaction_response = TransactionRead(
+            id = str(transaction.id),
+            user_id = str(transaction.user_id),
+            amount = transaction.amount,
+            type = transaction.type,
+            category = transaction.category,
+            note = transaction.note,
+            description = transaction.description,
+            transaction_date = transaction.transaction_date,
+            is_ai_categorize = transaction.is_ai_categorize,
+            created_at = transaction.created_at.isoformat(),
+            updated_at = transaction.updated_at.isoformat() if transaction.updated_at else None
+        )
+        transaction_responses.append(transaction_response)
+
+    return transaction_responses
 
 # Update user transaction
 @router.put("/update/{transaction_id}", response_model = TransactionRead)
