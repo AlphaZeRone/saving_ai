@@ -183,14 +183,14 @@ async def login_user(
     user_response = UserRead(
         id = str(user.id),
         email = user.email,
-        usename = user.username,
+        username = user.username,
         first_name = user.first_name,
         last_name = user.last_name,
         display_name = user.display_name,
         role = user.role,
         status = user.status,
         is_verified = user.is_verified,
-        created_at = user.created_at
+        created_at = user.created_at.isoformat()
     )
 
     return LoginResponse(
@@ -213,14 +213,14 @@ async def get_current_user_info(
     user_response = UserRead(
         id = str(user.id),
         email = user.email,
-        usename = user.username,
+        username = user.username,
         first_name = user.first_name,
         last_name = user.last_name,
         display_name = user.display_name,
         role = user.role,
         status = user.status,
         is_verified = user.is_verified,
-        created_at = user.created_at
+        created_at = user.created_at.isoformat()
     )
 
     return user_response
