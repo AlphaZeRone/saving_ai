@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 import os
 from dotenv import load_dotenv
 from api.auth import router as auth_router
+from api.transaction import router as transaction_router
 
 load_dotenv()
 
@@ -72,6 +73,7 @@ async def health_check():
 # ======== Include Router ========
 
 app.include_router(auth_router, prefix = "/api/auth", tags = ["Authetication"])
+app.include_router(transaction_router, prefix = "/api/transactions", tags = ["Transactions"])
 
 # ====== Testing Database Connection =========
 @app.get("/test-db")
