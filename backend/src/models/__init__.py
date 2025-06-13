@@ -12,5 +12,10 @@ __all__ = [
     "UserStatus",
     "UserCreate",
     "UserUpdate",
-    "UserRead"
+    "UserRead",
+    "Transaction",
+    "TransactionType",
+    "TransactionCreate",
+    "TransactionRead",
+    "TransactionUpdate"
 ]
