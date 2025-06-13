@@ -8,6 +8,7 @@ from models.transaction import Transaction, TransactionType, TransactionCreate, 
 from models.user import User
 from api.auth import require_auth
 from models.base import utc_now
+from core.ai_service import MoneyAI
 
 router = APIRouter()
 
@@ -158,3 +159,57 @@ async def delete_transaction(
     
     session.delete(transaction)
     session.commit()
+
+@router.post("/categorize/{transaction_id}")
+async def categorize_transaction(
+    transaction_id: str,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(require_auth)
+):
+    transaction = session.get(Transaction, transaction_id)
+    if not transaction:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "ไม่พบธุรกรรม"
+        )
+    
+    if transaction.user_id != current_user.id:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "ไม่พบธุรกรรม"
+        )
+    
+    try:
+        ai = MoneyAI()
+        result = ai.categorize_transaction(
+            description = transaction.description,
+            amount = transaction.amount,
+            transaction_type = transaction.type.value
+        )
+
+        print(f"AI Result: {result}")
+
+        if result["is_ai_categorized"]:
+            transaction.category = result["category"]
+            transaction.is_ai_categorize = True
+            transaction.updated_at = utc_now()
+
+            session.add(transaction)
+            session.commit()
+            session.refresh(transaction)
+
+        return {
+            "success": result["is_ai_categorized"],
+            "category": result["category"],
+            "confidence": result["confidence"],
+            "message": "จัดหมวดหมู่สำเร็จ" if result["is_ai_categorized"] else "ไม่สามารถจัดหมวดหมู่ได้"
+        }
+    
+    except Exception as e:
+        print(f"Categoriization Error: {e}")
+        return {
+            "success": False,
+            "category": "อื่นๆ",
+            "confidence": 0.0,
+            "message": f"เกิดข้อผิดพลาด: {str(e)}"
+        }
