@@ -12,5 +12,19 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  web:
+    build: .
+    container_name: saving_ai_web
+    ports:
+      - "8000:8000"
+    environment: 
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/saving_ai_dev
+    depends_on:
+      - postgres
+    volumes: 
+      - ./src:/app/src
+    restart: unless-stopped 
+    env_file: .env
+
 volumes:
   postgres_data:
