@@ -1,10 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends, status, Request, Response
-from sqlmodel import Session, select
+from sqlmodel import Session, select, func
 from typing import Optional, List
 
 from core.database import get_session
-from core.security import hash_password, verify_password, generate_session_token
-from models.transaction import Transaction, TransactionType, TransactionCreate, TransactionRead, TransactionUpdate
+from models.transaction import Transaction, TransactionType, TransactionCreate, TransactionRead, TransactionUpdate, PaginationInfo, TransactionPaginatedResponse
 from models.user import User
 from api.auth import require_auth
 from models.base import utc_now
@@ -53,35 +52,6 @@ async def create_transaction(
     )
 
     return transaction_response
-
-# Get all user transaction
-@router.get("/me", response_model = List[TransactionRead])
-async def  get_current_user_transaction(
-    session: Session = Depends(get_session),
-    current_user: User = Depends(require_auth)
-):
-    transactions = session.exec(
-        select(Transaction).where(Transaction.user_id == current_user.id)
-    ).all()
-
-    transaction_responses = []
-    for transaction in transactions:
-        transaction_response = TransactionRead(
-            id = str(transaction.id),
-            user_id = str(transaction.user_id),
-            amount = transaction.amount,
-            type = transaction.type,
-            category = transaction.category,
-            note = transaction.note,
-            description = transaction.description,
-            transaction_date = transaction.transaction_date,
-            is_ai_categorize = transaction.is_ai_categorize,
-            created_at = transaction.created_at.isoformat(),
-            updated_at = transaction.updated_at.isoformat() if transaction.updated_at else None
-        )
-        transaction_responses.append(transaction_response)
-
-    return transaction_responses
 
 # Update user transaction
 @router.put("/update/{transaction_id}", response_model = TransactionRead)
@@ -138,6 +108,7 @@ async def update_transaction(
 
     return transaction_response
 
+# Delete User transactions
 @router.delete("/delete/{transaction_id}", status_code = status.HTTP_204_NO_CONTENT)
 async def delete_transaction(
     transaction_id: str,
@@ -160,6 +131,7 @@ async def delete_transaction(
     session.delete(transaction)
     session.commit()
 
+# Categorize user transaction
 @router.post("/categorize/{transaction_id}")
 async def categorize_transaction(
     transaction_id: str,
@@ -213,3 +185,51 @@ async def categorize_transaction(
             "confidence": 0.0,
             "message": f"เกิดข้อผิดพลาด: {str(e)}"
         }
+
+# Pagnition 
+@router.get("/me", response_model = TransactionPaginatedResponse)
+async def get_current_query_user_transaction(
+    page: int = 1,
+    limit: int = 25,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(require_auth)
+):
+    total_count = session.exec(
+        select(func.count(Transaction.id)).where(Transaction.user_id == current_user.id)
+    ).one()
+    total_page = (total_count + (limit - 1)) // limit
+    has_next = page < total_page
+    has_prev = page > 1
+    skip = (page - 1) * limit
+    transactions = session.exec(
+        select(Transaction).where(Transaction.user_id == current_user.id).offset(skip).limit(limit)
+    ).all()
+
+    transaction_responses = []
+    for transaction in transactions:
+        transaction_response = TransactionRead(
+            id = str(transaction.id),
+            user_id = str(transaction.user_id),
+            amount = transaction.amount,
+            type = transaction.type,
+            category = transaction.category,
+            note = transaction.note,
+            description = transaction.description,
+            transaction_date = transaction.transaction_date,
+            is_ai_categorize = transaction.is_ai_categorize,
+            created_at = transaction.created_at.isoformat(),
+            updated_at = transaction.updated_at.isoformat() if transaction.updated_at else None
+        )
+        transaction_responses.append(transaction_response)
+
+    return TransactionPaginatedResponse(
+        data = transaction_responses,
+        pagination = PaginationInfo(
+            page = page,
+            limit = limit,
+            total = total_count,
+            pages = total_page,
+            has_next = has_next,
+            has_prev = has_prev
+        )
+    )

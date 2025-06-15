@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from sqlmodel import SQLModel, Field
 from datetime import date
 import enum
@@ -90,3 +90,16 @@ class TransactionUpdate(SQLModel):
     description: Optional[str]
     note: Optional[str]
     transaction_date: Optional[date]
+
+# ======== Pagination Response ================
+class PaginationInfo(SQLModel):
+    page: int
+    limit: int
+    total: int
+    pages: int
+    has_next: bool
+    has_prev: bool
+
+class TransactionPaginatedResponse(SQLModel):
+    data: List[TransactionRead]
+    pagination: PaginationInfo
