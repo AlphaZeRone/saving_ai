@@ -52,7 +52,7 @@ class Transaction(BaseModel, table = True):
     )
 
     transaction_date: date = Field(
-        default = None,
+        default = utc_now(),
         description = "วันที่ทำรายการ"
     )
 
