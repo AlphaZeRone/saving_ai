@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 from api.auth import router as auth_router
 from api.transaction import router as transaction_router
+from api.chat import router as chat_router
 
 load_dotenv()
 
@@ -74,6 +75,7 @@ async def health_check():
 
 app.include_router(auth_router, prefix = "/api/auth", tags = ["Authetication"])
 app.include_router(transaction_router, prefix = "/api/transactions", tags = ["Transactions"])
+app.include_router(chat_router, prefix = "/api/chat", tags = ["Chat"])
 
 # ====== Testing Database Connection =========
 @app.get("/test-db")

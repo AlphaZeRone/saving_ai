@@ -148,6 +148,7 @@ class MessageRead(SQLModel):
 
 class MessageCreate(SQLModel):
     content: str
+    conversation_id: Optional[str] = None
 
 class MessageUpdate(SQLModel):
     content: Optional[str]
