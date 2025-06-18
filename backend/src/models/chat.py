@@ -1,5 +1,6 @@
 from typing import Optional, List
 from sqlmodel import SQLModel, Field
+from pydantic import ConfigDict
 from datetime import datetime
 import enum
 import uuid
@@ -43,7 +44,7 @@ class Conversation(BaseModel, table = True):
     )
 
     total_message: int = Field(
-        default = 0,
+        default = 1,
         description = "จำนวนข้อความทั้งหมด"
     )
 
@@ -112,34 +113,48 @@ def generate_topic_from_message(message: str, max_chars: int = 40) -> str:
     if len(message) <= max_chars:
         return message
     else :
-        return message[:max_chars] + "..."
+        return message[:37] + "..."
     
 # ====== Chat Schema ============
 
 # Conversation Schema
 class ConversationRead(SQLModel):
-    id: str
-    user_id: str
+    model_config = ConfigDict(
+        json_encoders = {
+            uuid.UUID: str,
+            datetime: lambda v:  v.isoformat()
+        }
+    )
+
+    id: uuid.UUID
+    user_id: uuid.UUID
     topic: str
     total_message: int
     status: ConversationStatus
-    created_at: str
-    updated_at: Optional[str]
+    created_at: datetime
+    updated_at: Optional[datetime]
 
 class ConversationUpdate(SQLModel):
     topic: Optional[str]
     status: Optional[ConversationStatus]
-    updated_at: Optional[str]
+    updated_at: Optional[datetime]
 
 # Message Schema
 class MessageRead(SQLModel):
-    id: str
-    conversation_id: str
+    model_config = ConfigDict(
+        json_encoders = {
+            uuid.UUID: str,
+            datetime: lambda v: v.isoformat()
+        }
+    )
+
+    id: uuid.UUID
+    conversation_id: uuid.UUID
     content: str
     sender_type: MessageSender
     message_index: int
-    created_at: str
-    updated_at: Optional[str]
+    created_at: datetime
+    updated_at: Optional[datetime]
 
     # ===== AI_Specific Field =========
     token_used: Optional[int] = None
@@ -147,20 +162,39 @@ class MessageRead(SQLModel):
     ai_model: Optional[str] = None
 
 class MessageCreate(SQLModel):
+    model_config = ConfigDict(
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
+    )
+
     content: str
-    conversation_id: Optional[str] = None
+    conversation_id: Optional[uuid.UUID] = None
 
 class MessageUpdate(SQLModel):
+    model_config = ConfigDict(
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
+    )
+
     content: Optional[str]
-    updated_at: Optional[str]
+    updated_at: Optional[datetime]
 
 # Rating Schema
 class RatingRead(SQLModel):
-    id: str
-    message_id: str
+    model_config = ConfigDict(
+        json_encoder = {
+            uuid.UUID: str,
+            datetime: lambda v: v.isoformat()
+        }
+    )
+
+    id: uuid.UUID
+    message_id: uuid.UUID
     user_rating: Optional[int]
-    created_at: str
-    updated_at: Optional[str]
+    created_at: datetime
+    updated_at: Optional[datetime]
 
 class RatingCreate(SQLModel):
     user_rating: int
