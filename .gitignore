@@ -1,6 +1,15 @@
+<<<<<<< HEAD
 venv/
 .env
 __pycache__/
 *.pyc
 *.pyo
 .claude/
+=======
+venv/
+.env
+__pycache__/
+*.pyo
+*.pyc
+source/
+>>>>>>> 6563e49b59a03e0d73e2c4d2cec9abdc482d5ba5

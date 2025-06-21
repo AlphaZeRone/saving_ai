@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 fastapi == 0.115.12
 uvicorn[standard]
 sqlmodel
@@ -6,4 +7,14 @@ python-multipart
 python-jose[cryptography]
 passlib[bcrypt]
 python-dotenv
+=======
+fastapi == 0.115.12
+uvicorn[standard]
+sqlmodel
+psycopg2-binary
+python-multipart
+python-jose[cryptography]
+passlib[bcrypt]
+python-dotenv
+>>>>>>> 6563e49b59a03e0d73e2c4d2cec9abdc482d5ba5
 anthropic
