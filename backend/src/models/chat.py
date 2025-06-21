@@ -44,7 +44,6 @@ class Conversation(BaseModel, table = True):
     )
 
     total_message: int = Field(
-        default = 1,
         description = "จำนวนข้อความทั้งหมด"
     )
 
@@ -199,6 +198,11 @@ class RatingRead(SQLModel):
 class RatingCreate(SQLModel):
     user_rating: int
 
+# for create conversation list
+class ConversationWithLatestMessage(SQLModel):
+    conversation: ConversationRead
+    latest_message: Optional[MessageRead]
+
 # ====== Pagination ========
 class PaginationInfo(SQLModel):
     page: int
@@ -207,6 +211,10 @@ class PaginationInfo(SQLModel):
     pages: int
     has_next: bool
     has_prev: bool
+
+class ConversationWithLatestMessageResponse(SQLModel):
+    data: List[ConversationWithLatestMessage]
+    pagination: PaginationInfo
 
 class ConversationPaginatedResponse(SQLModel):
     data: List[ConversationRead]
@@ -222,4 +230,3 @@ class ChatResponse(SQLModel):
     ai_message: MessageRead
     conversation: ConversationRead
     recent_messages: List[MessageRead]
-
