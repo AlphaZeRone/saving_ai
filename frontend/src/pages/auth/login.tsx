@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { authAPI } from '@/api/client'
 import { useNavigate } from 'react-router-dom'
 
-export default function login() {
+export default function Login() {
 
     const Navigate = useNavigate()
 
