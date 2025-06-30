@@ -236,28 +236,59 @@ GET  /api/chat/messages/{conv_id} # Get conversation history
 
 ---
 
+## 📅 **Daily Work Schedule to Submission (1 Aug 2568)**
+
+### **วันจันทร์ 1 ก.ค. 2568 - CURRENT DAY**
+- ✅ เสร็จสิ้น Dashboard layout (dashboard.tsx)
+- ✅ เชื่อมต่อ SavingSummary + TransactionList
+- ✅ สร้าง mock data เพื่อทดสอบ
+
+### **วันอังคาร 2 ก.ค. 2568**
+- 🔄 API integration - เรียกข้อมูล transactions จริง
+- 🔄 Error handling และ loading states
+- 🔄 Dashboard route ใน routes.tsx
+
+### **วันพุธ 3 ก.ค. 2568**
+- ⏳ สร้าง QuickTransactionForm component
+- ⏳ CRUD operations (Create, Edit, Delete)
+- ⏳ Form validation
+
+### **วันพฤหัสบดี 4 ก.ค. 2568**
+- ⏳ สร้าง Chat interface พื้นฐาน
+- ⏳ AI integration ทดสอบ
+- ⏳ Responsive design เบื้องต้น
+
+### **วันศุกร์ 5 ก.ค. 2568**
+- ⏳ Integration testing
+- ⏳ Bug fixes
+- ⏳ Code cleanup
+
+### **สัปดาห์ที่ 2: Educational & Polish (8-12 ก.ค.)**
+- **8 ก.ค.:** Educational modules เบื้องต้น, Progressive unlocking system
+- **9 ก.ค.:** UI/UX improvements, Tailwind styling, Component polish
+- **10 ก.ค.:** Full responsive design, Mobile optimization
+- **11 ก.ค.:** Performance optimization, Loading states, Error boundaries
+- **12 ก.ค.:** Final integration testing, Bug fixes, Documentation update
+
+### **สัปดาห์ที่ 3: Finalization (15-19 ก.ค.)**
+- **15 ก.ค.:** User testing, Feedback implementation
+- **16-19 ก.ค.:** Thesis documentation, Final testing, Deployment preparation
+
+### **สัปดาห์ที่ 4: Submission (22-30 ก.ค.)**
+- **22-30 ก.ค.:** Final review และ polish, Thesis completion
+- **1 ส.ค. 2568: ส่งงาน** 🎯
+
+### **Progress Tracking Instructions:**
+เมื่อทำงานของวันนั้นๆเสร็จ ให้เลื่อนงานถัดไปขึ้นมาเป็น CURRENT DAY และอัปเดท status เป็น ✅
+
 ## 🎯 **Next Development Priorities**
 
-### **Immediate Tasks (Next 1-3 days):**
-1. **Create Dashboard route** in routes.tsx pointing to `/dashboard`
-2. **Implement Dashboard.tsx** with layout structure
-3. **Complete SavingsSummary component** with proper UI rendering
-4. **Create TransactionList component** with basic transaction display
-5. **Add TransactionForm component** for creating income/expense entries
-
-### **Short-term Goals (Next week):**
-1. **Transaction CRUD interface** with forms and validation
-2. **AI categorization integration** for automatic expense categorization  
-3. **Basic chat interface** for AI assistant interaction
-4. **User authentication state** management with Zustand
-5. **Responsive design** implementation across all components
-
-### **Medium-term Goals (July 2568):**
-1. **Educational modules** UI implementation
-2. **Progressive content unlocking** based on savings milestones
-3. **Advanced dashboard features** with charts and analytics
-4. **Mobile responsiveness** optimization
-5. **Testing and polish** for thesis submission
+### **Immediate Tasks (Current Focus):**
+1. **Complete Dashboard layout** (dashboard.tsx) - มี SavingSummary + TransactionList
+2. **API integration testing** - เรียกข้อมูล transactions จริง
+3. **Add Dashboard route** ใน routes.tsx
+4. **Error handling และ loading states**
+5. **Mock data creation** สำหรับการทดสอบ
 
 ---
 

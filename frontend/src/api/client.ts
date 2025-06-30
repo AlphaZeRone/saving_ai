@@ -1,5 +1,6 @@
 import axios from 'axios'
 import type { User, LoginData, RegisterData } from '@/types/api'
+import type { Transaction, TransactionData } from '@/types/api'
 
 const API_BASE_URL = 'http://localhost:8000'
 
@@ -61,3 +62,11 @@ export const authAPI = {
     getCurrentUser: () =>
         apiClient.get<User>('/api/auth/me'),
 } 
+
+// Transaction API
+export const transactionAPI = {
+    getAll: () => apiClient.get<Transaction[]>('/api/transactions'),
+    create: (data: TransactionData) => apiClient.post<Transaction>('/api/transactions', data),
+    update: (id: string, data: TransactionData) => apiClient.put<Transaction>(`/api/transactions/${id}`, data),
+    delete: (id: string) => apiClient.delete(`/api/transactions/${id}`)
+}
